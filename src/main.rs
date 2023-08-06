@@ -8,7 +8,7 @@ fn main() {
     let mut string_vec: Vec<String> = Vec::new();
     for line in lines {
         match line {
-            Ok(line_string) => string_vec.extend(parse::tokenize_line(&line_string)),
+            Ok(line_string) => parse::tokenize_line(&mut string_vec, &line_string),
             Err(error) => {
                 println!("Error: {}", error)
             }

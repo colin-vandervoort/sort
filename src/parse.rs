@@ -1,6 +1,6 @@
-pub fn tokenize_line<'a>(line: &'a str) -> Box<dyn Iterator<Item = String> + 'a> {
+pub fn tokenize_line(string_vec: &mut Vec<String>, line: &str) {
     let line_sep = "\n";
-    Box::new(line.split(line_sep).map(|token| String::from(token)))
+    string_vec.extend(line.split(line_sep).map(|token| String::from(token)))
 }
 
 // #[cfg(test)]
