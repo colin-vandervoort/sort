@@ -1,0 +1,5 @@
+pancake
+waffle
+quiche
+biscuit
+omelet
