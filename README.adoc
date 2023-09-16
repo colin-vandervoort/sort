@@ -32,3 +32,6 @@ cargo run -- [OPTIONS] [FILES]
 ----
 
 Replace `[OPTIONS]` and `[FILES]` with the desired command-line options and file paths.
+
+== Credits
+* Pokemon data sourced from https://www.kaggle.com/datasets/abcsds/pokemon
