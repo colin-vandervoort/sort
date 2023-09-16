@@ -1,0 +1,34 @@
+= sort
+
+sort is a command-line utility written in Rust that aims to implement the https://pubs.opengroup.org/onlinepubs/9699919799/utilities/sort.html[POSIX sort spec].
+
+== Getting Started
+
+=== Prerequisites
+
+To build and run you need to have Rust and Cargo (the Rust package manager) installed on your system. You can download and install them from the official link: https://www.rust-lang.org/tools/install
+
+=== Installation
+
+First, clone this repository to your local machine.
+
+[source,sh]
+----
+git clone https://github.com/colin-vandervoort/sort.git
+----
+
+Next, navigate to the project directory.
+
+[source,sh]
+----
+cd sort
+----
+
+Finally, build and run the project using Cargo:
+
+[source,sh]
+----
+cargo run -- [OPTIONS] [FILES]
+----
+
+Replace `[OPTIONS]` and `[FILES]` with the desired command-line options and file paths.
