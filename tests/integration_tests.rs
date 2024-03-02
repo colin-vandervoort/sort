@@ -1,5 +1,7 @@
 use std::{io::Write, process::Command, process::Stdio};
 
+mod util;
+
 #[test]
 fn test_sort_single_file() {
     let mut cmd_expect: std::process::Command = Command::new("sort");
@@ -26,7 +28,7 @@ fn test_sort_single_file() {
         .output()
         .expect("failed to execute process for command under test");
 
-    assert_eq!(output_actual, output_expect);
+    util::cmp_cmd_output(output_expect, output_actual);
 }
 
 #[test]
@@ -83,19 +85,5 @@ fn test_sort_stdin() {
         .wait_with_output()
         .expect("failed to read stdout");
 
-    let expect_stdout_string = String::from_utf8(output_expect.stdout).expect("not valid utf8");
-    let actual_stdout_string = String::from_utf8(output_actual.stdout).expect("not valid utf8");
-    println!("expect-stdout: {}", expect_stdout_string);
-    println!("actual-stdout: {}", actual_stdout_string);
-    assert_eq!(actual_stdout_string, expect_stdout_string);
-
-    let expect_stderr_string = String::from_utf8(output_expect.stderr).expect("not valid utf8");
-    let actual_stderr_string = String::from_utf8(output_actual.stderr).expect("not valid utf8");
-    println!("expect-stderr: {}", expect_stderr_string);
-    println!("actual-stderr: {}", actual_stderr_string);
-    assert_eq!(actual_stderr_string, expect_stderr_string);
-
-    println!("expect-status: {}", output_expect.status);
-    println!("actual-status: {}", output_actual.status);
-    assert_eq!(output_expect.status, output_actual.status);
+    util::cmp_cmd_output(output_expect, output_actual);
 }
