@@ -8,82 +8,104 @@ use std::{
 
 mod parse;
 
-static FLAG_FILE: &str = "file";
+static FLAG_CHECK: &str = "check";
 static FLAG_REVERSE: &str = "reverse";
+// static FLAG_UNIQUE: &str = "unique";
+
+static UNNAMED_ARGS: &str = "file";
 
 static STDIN_KEYWORD: &str = "-";
 
 struct SortSettings {
     ascend: bool,
-    sort_stdin: bool,
+    check: bool,
+    // unique: bool
+}
+
+enum SortInput<'a> {
+    File { path: &'a path::Path },
+    Stdin,
 }
 
 fn main() {
     let cli_matches = cli().get_matches();
 
-    let mut file_paths = match cli_matches.get_many::<String>(FLAG_FILE) {
-        Some(file_arg_matches) => file_arg_matches.collect(),
+    let unnamed_args = match cli_matches.get_many::<String>(UNNAMED_ARGS) {
+        Some(unnamed_arg_matches) => unnamed_arg_matches.collect(),
         None => Vec::new(),
     };
 
-    let sort_stdin = file_paths.iter().any(|&s| s == STDIN_KEYWORD) || (file_paths.len() == 0);
-    // remove '-' if it is present in the vec
-    file_paths.retain(|&p| p != STDIN_KEYWORD);
-
     let settings = SortSettings {
         ascend: !cli_matches.get_flag(FLAG_REVERSE),
-        sort_stdin,
+        check: cli_matches.get_flag(FLAG_CHECK),
+        // unique: cli_matches.get_flag(FLAG_UNIQUE),
     };
 
-    sort_all(&settings, file_paths);
+    let sort_inputs = match unnamed_args.as_slice() {
+        [] => vec![SortInput::Stdin],
+        [first] => vec![path_arg_to_sort_input(&first)],
+        [first, rest @ ..] => {
+            let mut inputs = vec![path_arg_to_sort_input(&first)];
+            if !settings.check {
+                inputs.extend(rest.iter().map(|path| path_arg_to_sort_input(path)))
+            }
+            inputs
+        }
+    };
+
+    sort_all(&settings, sort_inputs);
+}
+
+fn path_arg_to_sort_input(path: &String) -> SortInput {
+    if path.as_str() == STDIN_KEYWORD {
+        SortInput::Stdin
+    } else {
+        SortInput::File { path: path::Path::new(path) }
+    }
 }
 
 fn cli() -> Command {
     command!()
-        // .arg(
-        //     Arg::new("check")
-        //     .short('c')
-        //     .action(ArgAction::SetTrue)
-        // )
+        .arg(
+            Arg::new(FLAG_CHECK)
+            .short('c')
+            .action(ArgAction::SetTrue)
+        )
         .arg(Arg::new(FLAG_REVERSE).short('r').action(ArgAction::SetTrue))
-        .arg(Arg::new(FLAG_FILE).num_args(0..))
+        // .arg(Arg::new(FLAG_UNIQUE).short('u').action(ArgAction::SetTrue))
+        .arg(Arg::new(UNNAMED_ARGS).num_args(0..))
 }
 
-fn sort_all(settings: &SortSettings, file_paths: Vec<&String>) {
+fn sort_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
     let mut line_accumulator: Vec<String> = Vec::new();
 
-    for path in file_paths.iter().map(|path_str| path::Path::new(path_str)) {
-        match path.try_exists() {
-            Ok(exists) if (exists && path.is_dir()) => {
+    for input in sort_inputs {
+        match input {
+            SortInput::File { path } if path.exists() && path.is_dir() => {
                 eprintln!("sort: Is a directory");
                 std::process::exit(2);
-            }
-            Ok(exists) if !exists => {
+            },
+            SortInput::File { path } if !path.exists() => {
                 eprintln!("sort: No such file or directory");
                 std::process::exit(2);
-            }
-            Ok(_) => {
+            },
+            SortInput::File { path } => {
                 if let Ok(content) = fs::read_to_string(path) {
                     parse::tokenize_line(&mut line_accumulator, &content);
                 } else {
                     eprintln!("sort: Error when reading file {:?}", path);
                     std::process::exit(1);
                 }
-            }
-            Err(_) => {
-                eprintln!("sort: unknown error");
-                std::process::exit(1);
-            }
-        }
-    }
-
-    if settings.sort_stdin {
-        for input_line in io::stdin().lines() {
-            match input_line {
-                Ok(line_string) => parse::tokenize_line(&mut line_accumulator, &line_string),
-                Err(error) => {
-                    eprintln!("Error: {}", error);
-                    std::process::exit(1);
+            },
+            SortInput::Stdin => {
+                for input_line in io::stdin().lines() {
+                    match input_line {
+                        Ok(line_string) => parse::tokenize_line(&mut line_accumulator, &line_string),
+                        Err(error) => {
+                            eprintln!("Error: {}", error);
+                            std::process::exit(1);
+                        }
+                    }
                 }
             }
         }
