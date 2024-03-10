@@ -9,13 +9,13 @@ use std::{
 
 mod parse;
 
-static FLAG_CHECK: &str = "check";
-static FLAG_REVERSE: &str = "reverse";
-// static FLAG_UNIQUE: &str = "unique";
+const FLAG_CHECK: &str = "check";
+const FLAG_REVERSE: &str = "reverse";
+// const FLAG_UNIQUE: &str = "unique";
 
-static UNNAMED_ARGS: &str = "file";
+const UNNAMED_ARGS: &str = "file";
 
-static STDIN_KEYWORD: &str = "-";
+const STDIN_KEYWORD: &str = "-";
 
 struct SortSettings {
     ascend: bool,
