@@ -112,9 +112,7 @@ fn accumulate_lines(sort_inputs: Vec<SortInput<'_>>, line_accumulator: &mut Vec<
             SortInput::Stdin => {
                 for input_line in io::stdin().lines() {
                     match input_line {
-                        Ok(line_string) => {
-                            parse::tokenize_line(line_accumulator, &line_string)
-                        }
+                        Ok(line_string) => parse::tokenize_line(line_accumulator, &line_string),
                         Err(error) => {
                             eprintln!("Error: {}", error);
                             std::process::exit(1);
