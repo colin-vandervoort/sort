@@ -19,7 +19,7 @@ const STDIN_KEYWORD: &str = "-";
 
 struct SortSettings {
     ascend: bool,
-    check: bool,
+    checked_file_name: Option<String>,
     // unique: bool
 }
 
@@ -38,7 +38,11 @@ fn main() {
 
     let settings = SortSettings {
         ascend: !cli_matches.get_flag(FLAG_REVERSE),
-        check: cli_matches.get_flag(FLAG_CHECK),
+        checked_file_name: match cli_matches.get_flag(FLAG_CHECK) {
+            true if unnamed_args.is_empty() => STDIN_KEYWORD.to_string().into(),
+            true => Some(unnamed_args[0].clone()),
+            false => None,
+        },
         // unique: cli_matches.get_flag(FLAG_UNIQUE),
     };
 
@@ -46,7 +50,7 @@ fn main() {
         [] => vec![SortInput::Stdin],
         [first] => vec![path_arg_to_sort_input(&first)],
         [first, rest @ ..] => {
-            if settings.check {
+            if settings.checked_file_name.is_some() {
                 vec![path_arg_to_sort_input(&first)]
             } else {
                 iter::once(first)
@@ -115,10 +119,13 @@ fn sort_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
         }
     }
 
-    line_accumulator.sort_by(|a, b| line_order(settings, a, b));
-
-    for string in line_accumulator.iter() {
-        println!("{}", string);
+    if settings.checked_file_name.is_some() {
+        check_sorted(&settings, &line_accumulator);
+    } else {
+        line_accumulator.sort_by(|a, b| line_order(settings, a, b));
+        for string in line_accumulator.iter() {
+            println!("{}", string);
+        }
     }
 }
 
@@ -142,19 +149,23 @@ fn line_order(settings: &SortSettings, first_line: &String, second_line: &String
     }
 }
 
-// fn check_sorted(settings: &SortSettings, lines: Vec<&String>) {
-//     let mut prev: Option<&String> = None;
-//     for line in lines {
-//         match prev {
-//             Some(prev_line) => {
-//                 match line_order(settings, prev_line, line) {
-//                     Ordering::Equal => continue,
-//                     _ => {
-
-//                     }
-//                 };
-//             },
-//             None => prev = Some(line)
-//         }
-//     }
-// }
+fn check_sorted(settings: &SortSettings, lines: &Vec<String>) {
+    let mut prev: Option<String> = None;
+    for (idx, line) in lines.iter().enumerate() {
+        if let Some(ref prev_line) = prev {
+            match line_order(settings, &prev_line, &line) {
+                Ordering::Greater => {
+                    eprintln!(
+                        "sort: {}:{}: disorder: {}",
+                        settings.checked_file_name.as_ref().unwrap(),
+                        idx + 1,
+                        line
+                    );
+                    std::process::exit(1);
+                }
+                _ => (),
+            };
+        }
+        prev = Some(line.clone());
+    }
+}
