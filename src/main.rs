@@ -64,17 +64,15 @@ fn path_arg_to_sort_input(path: &String) -> SortInput {
     if path.as_str() == STDIN_KEYWORD {
         SortInput::Stdin
     } else {
-        SortInput::File { path: path::Path::new(path) }
+        SortInput::File {
+            path: path::Path::new(path),
+        }
     }
 }
 
 fn cli() -> Command {
     command!()
-        .arg(
-            Arg::new(FLAG_CHECK)
-            .short('c')
-            .action(ArgAction::SetTrue)
-        )
+        .arg(Arg::new(FLAG_CHECK).short('c').action(ArgAction::SetTrue))
         .arg(Arg::new(FLAG_REVERSE).short('r').action(ArgAction::SetTrue))
         // .arg(Arg::new(FLAG_UNIQUE).short('u').action(ArgAction::SetTrue))
         .arg(Arg::new(UNNAMED_ARGS).num_args(0..))
@@ -88,11 +86,11 @@ fn sort_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
             SortInput::File { path } if path.exists() && path.is_dir() => {
                 eprintln!("sort: Is a directory");
                 std::process::exit(2);
-            },
+            }
             SortInput::File { path } if !path.exists() => {
                 eprintln!("sort: No such file or directory");
                 std::process::exit(2);
-            },
+            }
             SortInput::File { path } => {
                 if let Ok(content) = fs::read_to_string(path) {
                     parse::tokenize_line(&mut line_accumulator, &content);
@@ -100,11 +98,13 @@ fn sort_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
                     eprintln!("sort: Error when reading file {:?}", path);
                     std::process::exit(1);
                 }
-            },
+            }
             SortInput::Stdin => {
                 for input_line in io::stdin().lines() {
                     match input_line {
-                        Ok(line_string) => parse::tokenize_line(&mut line_accumulator, &line_string),
+                        Ok(line_string) => {
+                            parse::tokenize_line(&mut line_accumulator, &line_string)
+                        }
                         Err(error) => {
                             eprintln!("Error: {}", error);
                             std::process::exit(1);
@@ -123,7 +123,7 @@ fn sort_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
 }
 
 fn line_order(settings: &SortSettings, first_line: &String, second_line: &String) -> Ordering {
-    return match first_line.cmp(second_line) {
+    match first_line.cmp(second_line) {
         Ordering::Greater => {
             if settings.ascend {
                 Ordering::Greater
@@ -139,7 +139,7 @@ fn line_order(settings: &SortSettings, first_line: &String, second_line: &String
                 Ordering::Greater
             }
         }
-    };
+    }
 }
 
 // fn check_sorted(settings: &SortSettings, lines: Vec<&String>) {
