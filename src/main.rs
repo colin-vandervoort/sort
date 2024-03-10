@@ -61,7 +61,15 @@ fn main() {
         }
     };
 
-    process_all(&settings, sort_inputs);
+    let mut line_accumulator: Vec<String> = Vec::new();
+
+    accumulate_lines(sort_inputs, &mut line_accumulator);
+
+    if settings.checked_file_name.is_some() {
+        check_sorted(&settings, &line_accumulator);
+    } else {
+        sort_all(&settings, &mut line_accumulator);
+    }
 }
 
 fn path_arg_to_sort_input(path: &String) -> SortInput {
@@ -82,9 +90,7 @@ fn cli() -> Command {
         .arg(Arg::new(UNNAMED_ARGS).num_args(0..))
 }
 
-fn process_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
-    let mut line_accumulator: Vec<String> = Vec::new();
-
+fn accumulate_lines(sort_inputs: Vec<SortInput<'_>>, line_accumulator: &mut Vec<String>) {
     for input in sort_inputs {
         match input {
             SortInput::File { path } if path.exists() && path.is_dir() => {
@@ -97,7 +103,7 @@ fn process_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
             }
             SortInput::File { path } => {
                 if let Ok(content) = fs::read_to_string(path) {
-                    parse::tokenize_line(&mut line_accumulator, &content);
+                    parse::tokenize_line(line_accumulator, &content);
                 } else {
                     eprintln!("sort: Error when reading file {:?}", path);
                     std::process::exit(1);
@@ -107,7 +113,7 @@ fn process_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
                 for input_line in io::stdin().lines() {
                     match input_line {
                         Ok(line_string) => {
-                            parse::tokenize_line(&mut line_accumulator, &line_string)
+                            parse::tokenize_line(line_accumulator, &line_string)
                         }
                         Err(error) => {
                             eprintln!("Error: {}", error);
@@ -117,12 +123,6 @@ fn process_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
                 }
             }
         }
-    }
-
-    if settings.checked_file_name.is_some() {
-        check_sorted(&settings, &line_accumulator);
-    } else {
-        sort_all(&settings, &mut line_accumulator);
     }
 }
 
