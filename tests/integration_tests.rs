@@ -31,3 +31,23 @@ fn test_check_file() {
     };
     util::cmp_actual_expect(test_params);
 }
+
+#[test]
+fn test_check_file_unique() {
+    let test_params = util::TestParams {
+        env_vars: HashMap::new(),
+        stdin: None,
+        args: &["-c", "-u", "tests/data/lunch-sorted-non-uniq.txt"],
+    };
+    util::cmp_actual_expect(test_params);
+}
+
+#[test]
+fn test_sort_file_unique() {
+    let test_params = util::TestParams {
+        env_vars: HashMap::new(),
+        stdin: None,
+        args: &["-u", "tests/data/lunch-sorted-non-uniq.txt"],
+    };
+    util::cmp_actual_expect(test_params);
+}
