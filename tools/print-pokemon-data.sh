@@ -7,7 +7,7 @@ project_path="$(cd -- "${script_path}/.." &> /dev/null  && pwd -P)"
 pokemon_data_path="${project_path}/tests/data/Pokemon.csv"
 
 usage() {
-    echo "Usage: ./tools/print-pokemon-data.sh <OPTIONS>"
+    echo "Usage: $0 <OPTIONS>"
     echo "    OPTIONS:"
     echo "        -c <NUM>       column index"
     echo "        -s <SEPSTRING> output separator"
