@@ -3,6 +3,7 @@ use std::{
     cmp::Ordering,
     fs::{self},
     io::{self},
+    iter::{self},
     path,
 };
 
@@ -45,11 +46,14 @@ fn main() {
         [] => vec![SortInput::Stdin],
         [first] => vec![path_arg_to_sort_input(&first)],
         [first, rest @ ..] => {
-            let mut inputs = vec![path_arg_to_sort_input(&first)];
-            if !settings.check {
-                inputs.extend(rest.iter().map(|path| path_arg_to_sort_input(path)))
+            if settings.check {
+                vec![path_arg_to_sort_input(&first)]
+            } else {
+                iter::once(first)
+                    .chain(rest.iter())
+                    .map(|input| path_arg_to_sort_input(input))
+                    .collect()
             }
-            inputs
         }
     };
 
