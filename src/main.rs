@@ -11,7 +11,7 @@ mod parse;
 
 const FLAG_CHECK: &str = "check";
 const FLAG_REVERSE: &str = "reverse";
-// const FLAG_UNIQUE: &str = "unique";
+const FLAG_UNIQUE: &str = "unique";
 
 const UNNAMED_ARGS: &str = "file";
 
@@ -20,7 +20,7 @@ const STDIN_KEYWORD: &str = "-";
 struct SortSettings {
     ascend: bool,
     checked_file_name: Option<String>,
-    // unique: bool
+    unique: bool,
 }
 
 enum SortInput<'a> {
@@ -43,7 +43,7 @@ fn main() {
             true => Some(unnamed_args[0].clone()),
             false => None,
         },
-        // unique: cli_matches.get_flag(FLAG_UNIQUE),
+        unique: cli_matches.get_flag(FLAG_UNIQUE),
     };
 
     let sort_inputs = match unnamed_args.as_slice() {
@@ -78,7 +78,7 @@ fn cli() -> Command {
     command!()
         .arg(Arg::new(FLAG_CHECK).short('c').action(ArgAction::SetTrue))
         .arg(Arg::new(FLAG_REVERSE).short('r').action(ArgAction::SetTrue))
-        // .arg(Arg::new(FLAG_UNIQUE).short('u').action(ArgAction::SetTrue))
+        .arg(Arg::new(FLAG_UNIQUE).short('u').action(ArgAction::SetTrue))
         .arg(Arg::new(UNNAMED_ARGS).num_args(0..))
 }
 
@@ -155,6 +155,15 @@ fn check_sorted(settings: &SortSettings, lines: &Vec<String>) {
         if let Some(ref prev_line) = prev {
             match line_order(settings, &prev_line, &line) {
                 Ordering::Greater => {
+                    eprintln!(
+                        "sort: {}:{}: disorder: {}",
+                        settings.checked_file_name.as_ref().unwrap(),
+                        idx + 1,
+                        line
+                    );
+                    std::process::exit(1);
+                }
+                Ordering::Equal if settings.unique => {
                     eprintln!(
                         "sort: {}:{}: disorder: {}",
                         settings.checked_file_name.as_ref().unwrap(),
