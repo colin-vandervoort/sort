@@ -61,7 +61,7 @@ fn main() {
         }
     };
 
-    sort_all(&settings, sort_inputs);
+    process_all(&settings, sort_inputs);
 }
 
 fn path_arg_to_sort_input(path: &String) -> SortInput {
@@ -82,7 +82,7 @@ fn cli() -> Command {
         .arg(Arg::new(UNNAMED_ARGS).num_args(0..))
 }
 
-fn sort_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
+fn process_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
     let mut line_accumulator: Vec<String> = Vec::new();
 
     for input in sort_inputs {
@@ -122,10 +122,7 @@ fn sort_all(settings: &SortSettings, sort_inputs: Vec<SortInput>) {
     if settings.checked_file_name.is_some() {
         check_sorted(&settings, &line_accumulator);
     } else {
-        line_accumulator.sort_by(|a, b| line_order(settings, a, b));
-        for string in line_accumulator.iter() {
-            println!("{}", string);
-        }
+        sort_all(&settings, &mut line_accumulator);
     }
 }
 
@@ -146,6 +143,16 @@ fn line_order(settings: &SortSettings, first_line: &String, second_line: &String
                 Ordering::Greater
             }
         }
+    }
+}
+
+fn sort_all(settings: &SortSettings, lines: &mut Vec<String>) {
+    lines.sort_by(|a, b| line_order(settings, a, b));
+    if settings.unique {
+        lines.dedup();
+    }
+    for string in lines.iter() {
+        println!("{}", string);
     }
 }
 
