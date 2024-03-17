@@ -1,9 +1,13 @@
 use clap::{command, Arg, ArgAction};
 use std::{cell, iter, path::PathBuf};
 
+use crate::parse::SortLine;
+
 const FLAG_CHECK: &str = "check";
 const FLAG_REVERSE: &str = "reverse";
 const FLAG_UNIQUE: &str = "unique";
+const FLAG_NUMERIC: &str = "numeric-sort";
+const FLAG_KEYDEF: &str = "key";
 const FLAG_ZERO_TERMINATED: &str = "zero-terminated";
 const UNNAMED_ARGS: &str = "file";
 
@@ -14,6 +18,8 @@ pub struct Settings {
     pub checked_file_name: Option<String>,
     pub unique: bool,
     pub nul_term: bool,
+    pub sort_by_keydef: bool,
+    pub sort_numeric: bool,
 }
 
 pub enum SortInput {
@@ -34,7 +40,7 @@ fn path_arg_to_sort_input(path: &String) -> SortInput {
 pub struct App {
     pub settings: Settings,
     pub input: Vec<SortInput>,
-    pub line_accumulator: cell::RefCell<Vec<String>>,
+    pub line_accumulator: cell::RefCell<Vec<SortLine>>,
 }
 
 impl App {
@@ -43,6 +49,8 @@ impl App {
             .arg(Arg::new(FLAG_CHECK).short('c').action(ArgAction::SetTrue))
             .arg(Arg::new(FLAG_REVERSE).short('r').action(ArgAction::SetTrue))
             .arg(Arg::new(FLAG_UNIQUE).short('u').action(ArgAction::SetTrue))
+            .arg(Arg::new(FLAG_NUMERIC).short('n').action(ArgAction::SetTrue))
+            .arg(Arg::new(FLAG_KEYDEF).short('k').action(ArgAction::SetTrue))
             .arg(
                 Arg::new(FLAG_ZERO_TERMINATED)
                     .short('z')
@@ -82,6 +90,8 @@ impl App {
                 ascend: !cli_matches.get_flag(FLAG_REVERSE),
                 checked_file_name,
                 unique: cli_matches.get_flag(FLAG_UNIQUE),
+                sort_by_keydef: cli_matches.get_flag(FLAG_KEYDEF),
+                sort_numeric: cli_matches.get_flag(FLAG_NUMERIC),
                 nul_term: cli_matches.get_flag(FLAG_ZERO_TERMINATED),
             },
             input,

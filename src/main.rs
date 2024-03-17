@@ -8,6 +8,7 @@ use std::{
 };
 
 use crate::app::{App, SortInput};
+use crate::parse::SortLine;
 
 fn main() {
     let app = App::new();
@@ -57,7 +58,7 @@ fn accumulate_lines(app: &App) {
     }
 }
 
-fn line_order(app: &App, first_line: &String, second_line: &String) -> Ordering {
+fn line_order(app: &App, first_line: &SortLine, second_line: &SortLine) -> Ordering {
     match first_line.cmp(second_line) {
         Ordering::Greater => {
             if app.settings.ascend {
@@ -91,7 +92,7 @@ fn sort_all(app: &App) {
 }
 
 fn check_sorted(app: &App) {
-    let mut prev: Option<String> = None;
+    let mut prev: Option<SortLine> = None;
     for (idx, line) in app.line_accumulator.borrow_mut().iter().enumerate() {
         if let Some(ref prev_line) = prev {
             match line_order(app, &prev_line, &line) {
