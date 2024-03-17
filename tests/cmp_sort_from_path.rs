@@ -1,7 +1,7 @@
 mod util;
 
+use crate::util::{cmp_actual_expect, TestParams};
 use std::collections::HashMap;
-use crate::util::{TestParams, cmp_actual_expect};
 
 #[test]
 fn test_sort_single_file() {
@@ -56,9 +56,7 @@ fn test_sort_file_unique() {
 #[test]
 fn test_sort_numeric_en() {
     let test_params = TestParams {
-        env_vars: HashMap::from([
-            ("LANG", "en_EN")
-        ]),
+        env_vars: HashMap::from([("LANG", "en_EN")]),
         stdin: None,
         args: &["-n", "tests/data/numeric.txt"],
     };
@@ -68,9 +66,7 @@ fn test_sort_numeric_en() {
 #[test]
 fn test_sort_numeric_de() {
     let test_params = TestParams {
-        env_vars: HashMap::from([
-            ("LANG", "De_DE")
-        ]),
+        env_vars: HashMap::from([("LANG", "De_DE")]),
         stdin: None,
         args: &["-n", "tests/data/numeric.txt"],
     };

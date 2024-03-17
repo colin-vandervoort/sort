@@ -1,10 +1,11 @@
 use crate::app::App;
 
+
 pub fn tokenize_into_lines(app: &App, input: &str) {
-    let line_sep = if app.settings.zero_terminated { "\0" } else { "\n" };
+    let sep = if app.settings.nul_term { "\0" } else { "\n" };
     app.line_accumulator
         .borrow_mut()
-        .extend(input.split(line_sep).map(|token| String::from(token)))
+        .extend(input.split(sep).map(|token| String::from(token)))
 }
 
 // #[cfg(test)]

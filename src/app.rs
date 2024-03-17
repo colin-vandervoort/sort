@@ -13,7 +13,7 @@ pub struct Settings {
     pub ascend: bool,
     pub checked_file_name: Option<String>,
     pub unique: bool,
-    pub zero_terminated: bool,
+    pub nul_term: bool,
 }
 
 pub enum SortInput {
@@ -43,7 +43,11 @@ impl App {
             .arg(Arg::new(FLAG_CHECK).short('c').action(ArgAction::SetTrue))
             .arg(Arg::new(FLAG_REVERSE).short('r').action(ArgAction::SetTrue))
             .arg(Arg::new(FLAG_UNIQUE).short('u').action(ArgAction::SetTrue))
-            .arg(Arg::new(FLAG_ZERO_TERMINATED).short('z').action(ArgAction::SetTrue))
+            .arg(
+                Arg::new(FLAG_ZERO_TERMINATED)
+                    .short('z')
+                    .action(ArgAction::SetTrue),
+            )
             .arg(Arg::new(UNNAMED_ARGS).num_args(0..))
             .get_matches();
 
@@ -78,7 +82,7 @@ impl App {
                 ascend: !cli_matches.get_flag(FLAG_REVERSE),
                 checked_file_name,
                 unique: cli_matches.get_flag(FLAG_UNIQUE),
-                zero_terminated: cli_matches.get_flag(FLAG_ZERO_TERMINATED),
+                nul_term: cli_matches.get_flag(FLAG_ZERO_TERMINATED),
             },
             input,
             line_accumulator: cell::RefCell::new(Vec::new()),

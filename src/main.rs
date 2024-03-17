@@ -83,7 +83,7 @@ fn sort_all(app: &App) {
     if app.settings.unique {
         lines.dedup();
     }
-    let line_sep = if app.settings.zero_terminated { "\0" } else { "\n" };
+    let line_sep = if app.settings.nul_term { "\0" } else { "\n" };
     let _ = io::stdout().lock();
     for line in lines.iter() {
         print!("{}{}", line, line_sep);
