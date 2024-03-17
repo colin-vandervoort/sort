@@ -61,3 +61,13 @@ fn test_sort_numeric() {
     };
     util::cmp_actual_expect(test_params);
 }
+
+#[test]
+fn test_zero_terminated() {
+    let test_params = util::TestParams {
+        env_vars: HashMap::new(),
+        stdin: None,
+        args: &["-z", "tests/data/nul-dip"],
+    };
+    util::cmp_actual_expect(test_params);
+}
