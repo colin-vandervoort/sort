@@ -53,9 +53,23 @@ fn test_sort_file_unique() {
 }
 
 #[test]
-fn test_sort_numeric() {
+fn test_sort_numeric_en() {
     let test_params = util::TestParams {
-        env_vars: HashMap::new(),
+        env_vars: HashMap::from([
+            ("LANG", "en_EN")
+        ]),
+        stdin: None,
+        args: &["-n", "tests/data/numeric.txt"],
+    };
+    util::cmp_actual_expect(test_params);
+}
+
+#[test]
+fn test_sort_numeric_de() {
+    let test_params = util::TestParams {
+        env_vars: HashMap::from([
+            ("LANG", "De_DE")
+        ]),
         stdin: None,
         args: &["-n", "tests/data/numeric.txt"],
     };

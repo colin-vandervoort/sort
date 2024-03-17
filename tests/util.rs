@@ -3,7 +3,7 @@ use std::io::Write;
 use std::process::{Command, Output, Stdio};
 
 pub struct TestParams<'a> {
-    pub env_vars: HashMap<String, String>,
+    pub env_vars: HashMap<&'a str, &'a str>,
     pub stdin: Option<&'static str>,
     pub args: &'a [&'a str],
 }
