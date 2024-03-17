@@ -67,6 +67,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "cjsort"
+version = "0.1.0"
+dependencies = [
+ "clap",
+]
+
+[[package]]
 name = "clap"
 version = "4.3.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -205,13 +212,6 @@ dependencies = [
  "libc",
  "linux-raw-sys",
  "windows-sys",
-]
-
-[[package]]
-name = "sort"
-version = "0.1.0"
-dependencies = [
- "clap",
 ]
 
 [[package]]
