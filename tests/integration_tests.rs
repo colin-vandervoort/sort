@@ -51,3 +51,13 @@ fn test_sort_file_unique() {
     };
     util::cmp_actual_expect(test_params);
 }
+
+#[test]
+fn test_sort_numeric() {
+    let test_params = util::TestParams {
+        env_vars: HashMap::new(),
+        stdin: None,
+        args: &["-n", "tests/data/numeric.txt"],
+    };
+    util::cmp_actual_expect(test_params);
+}
